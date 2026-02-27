@@ -1,0 +1,29 @@
+name: pr-ready
+steps:
+  - name: lint
+    task: "Run ESLint and Prettier. Fix all auto-fixable issues. Report any that need manual attention."
+    on_fail: stop
+
+  - name: test
+    task: "Run the test suite. All tests must pass. Report results."
+    on_fail: stop
+
+  - name: security-scan
+    task: "Run npm audit. Check for HIGH or CRITICAL vulnerabilities. Report findings and fix any that have available patches."
+    on_fail: continue
+
+  - name: coverage
+    task: "Check test coverage. If coverage is below 80%, identify the most critical uncovered paths and write tests for them."
+    on_fail: continue
+
+  - name: docs
+    task: "Review the changes in this branch. Update README.md, JSDoc comments, or inline documentation if any public APIs have changed."
+    on_fail: continue
+
+  - name: pr-description
+    task: "Generate a clear, structured pull request description in Markdown format. Include: Summary of changes, How to test, Screenshots section (if UI changed), Breaking changes (if any). Output to PR_DESCRIPTION.md."
+    on_fail: continue
+
+  - name: commit
+    task: "Stage and commit all changes including documentation updates. Use a conventional commit message format."
+    condition: always

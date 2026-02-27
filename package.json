@@ -1,0 +1,37 @@
+{
+  "name": "claude-pipeline",
+  "version": "1.0.0",
+  "description": "Chain Claude Code tasks into YAML-defined pipelines",
+  "type": "module",
+  "bin": {
+    "claude-pipeline": "./bin/pipeline.js"
+  },
+  "main": "./src/index.js",
+  "files": [
+    "bin/",
+    "src/",
+    "templates/"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint src/ bin/"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "pipeline",
+    "automation",
+    "ai",
+    "cli"
+  ],
+  "author": "NickCirv",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

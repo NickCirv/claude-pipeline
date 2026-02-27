@@ -1,0 +1,23 @@
+name: security-scan
+steps:
+  - name: dependency-audit
+    task: "Run npm audit --audit-level=moderate. List all vulnerabilities found grouped by severity (CRITICAL, HIGH, MODERATE). Output as a structured report."
+    on_fail: continue
+
+  - name: fix-dependencies
+    task: "Fix all CRITICAL and HIGH severity vulnerabilities found in the previous step using npm audit fix. If --force is needed, evaluate the breaking change risk first and only proceed if safe."
+    depends_on: dependency-audit
+    condition: failed
+    on_fail: continue
+
+  - name: secrets-scan
+    task: "Search the entire codebase for accidentally committed secrets. Check for: API keys, tokens, passwords, private keys, .env values embedded in source files. Use patterns like: sk-, pk-, ghp_, AKIA, etc. Report any findings with file paths and line numbers."
+    on_fail: continue
+
+  - name: owasp-check
+    task: "Review the codebase for the following OWASP Top 10 issues: 1) SQL/command injection, 2) Broken authentication (hardcoded credentials, weak JWT), 3) XSS vulnerabilities, 4) Insecure direct object references, 5) Security misconfiguration (exposed debug endpoints, verbose errors in production). Report findings with severity."
+    on_fail: continue
+
+  - name: security-report
+    task: "Based on all findings from the previous steps, produce a SECURITY-REPORT.md with: Executive summary, Findings by severity, Recommended remediation steps, Files to review immediately."
+    condition: always

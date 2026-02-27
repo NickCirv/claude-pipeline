@@ -1,0 +1,28 @@
+name: ci-fix
+steps:
+  - name: lint
+    task: "Run ESLint on the entire project. Fix all auto-fixable issues with --fix. Report any remaining issues that need manual attention."
+    on_fail: stop
+
+  - name: type-check
+    task: "Run TypeScript type checking (tsc --noEmit). List all type errors found."
+    on_fail: continue
+
+  - name: fix-types
+    task: "Fix all TypeScript type errors reported in the previous step. Do not change business logic, only fix type annotations."
+    depends_on: type-check
+    condition: failed
+
+  - name: test
+    task: "Run the full test suite. Report how many tests pass, fail, or are skipped."
+    on_fail: continue
+
+  - name: fix-tests
+    task: "Fix any failing tests identified in the previous step. Focus on fixing the implementation, not weakening the tests."
+    depends_on: test
+    condition: failed
+    retry: 2
+
+  - name: commit
+    task: "Commit all changes made in this pipeline with a clear, descriptive commit message that summarises what was fixed."
+    condition: always
