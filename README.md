@@ -1,40 +1,55 @@
+<div align="center">
+
 # claude-pipeline
 
-Chain Claude Code tasks into YAML-defined pipelines. Like GitHub Actions, but Claude is every step.
+**Run Claude Code as every step of a YAML-defined workflow**
 
-![claude-pipeline banner](./banner.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-0B0A09?style=flat-square&logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![Node >=18](https://img.shields.io/badge/Node-%3E%3D18-0B0A09?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+
+</div>
 
 ## Install
 
 ```bash
-npm install -g claude-pipeline
-# or use without installing:
-npx claude-pipeline run pipeline.yml
+npx github:NickCirv/claude-pipeline init
 ```
 
-## Quick Start
+> Requires Node 18+ and the [`claude` CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated.
+
+## Usage
 
 ```bash
-# Create a sample pipeline in the current directory
-npx claude-pipeline init
+# Scaffold a pipeline in the current directory
+npx github:NickCirv/claude-pipeline init
 
 # Run it
-npx claude-pipeline run pipeline.yml
+npx github:NickCirv/claude-pipeline run pipeline.yml
 
 # Validate syntax without running
-npx claude-pipeline validate pipeline.yml
+npx github:NickCirv/claude-pipeline validate pipeline.yml
 
 # List all pipelines in the project
-npx claude-pipeline list
+npx github:NickCirv/claude-pipeline list
 ```
 
-## Pipeline Format
+### `run` flags
+
+| Flag | Description |
+|------|-------------|
+| `-d, --dry-run` | Print steps without executing |
+| `-v, --verbose` | Show step output previews in real-time |
+| `--json` | Output full result as JSON after execution |
+
+## What it does
+
+claude-pipeline lets you define multi-step Claude Code workflows in YAML — similar to GitHub Actions, but Claude is the executor of every step. Each step receives the output of all previous steps as context, so a `fix-tests` step automatically knows which tests failed. Steps support conditional execution, dependency ordering, and configurable retry counts.
 
 ```yaml
 name: ci-fix
 steps:
   - name: lint
-    task: "Run ESLint on the project, fix auto-fixable issues"
+    task: "Run ESLint, fix auto-fixable issues"
     on_fail: stop
 
   - name: test
@@ -50,24 +65,20 @@ steps:
     task: "Commit all changes with a descriptive message"
 ```
 
-## Step Options
+### Step options
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `name` | string | required | Unique step identifier |
-| `task` | string | required | Natural language instruction sent to Claude |
-| `on_fail` | `stop` \| `continue` | `stop` | What to do when this step fails |
-| `depends_on` | string \| string[] | — | Run this step only after the named step(s) |
-| `condition` | `always` \| `failed` \| `passed` \| `any` | `always` | When to run this step relative to its dependency |
-| `retry` | 1–5 | 1 | Number of attempts before marking as failed |
+| `task` | string | required | Natural language instruction for Claude |
+| `on_fail` | `stop` \| `continue` | `stop` | What to do when a step fails |
+| `depends_on` | string \| string[] | — | Run after the named step(s) |
+| `condition` | `always` \| `failed` \| `passed` \| `any` | `always` | When to run relative to dependency |
+| `retry` | 1–5 | 1 | Attempts before marking failed |
 
-## Context Chaining
+### Included templates
 
-Each step receives the output of all previous steps as context. This lets later steps build on earlier ones — e.g. a `fix-tests` step automatically knows which tests failed.
-
-## Templates
-
-Three ready-made templates are included in `templates/`:
+Three ready-made templates live in `templates/`:
 
 | Template | Purpose |
 |----------|---------|
@@ -75,30 +86,6 @@ Three ready-made templates are included in `templates/`:
 | `pr-ready.yml` | Full pre-PR checklist: lint, test, security, coverage, docs, PR description |
 | `security-scan.yml` | Dependency audit → secrets scan → OWASP check → security report |
 
-Copy any template to your project:
+---
 
-```bash
-cp node_modules/claude-pipeline/templates/ci-fix.yml ./pipeline.yml
-```
-
-## CLI Reference
-
-```
-claude-pipeline run <file>      Execute a pipeline
-  --dry-run                     Print steps without executing
-  --verbose                     Show step output previews
-  --json                        Output full result as JSON
-
-claude-pipeline init [name]     Create a sample pipeline.yml
-claude-pipeline validate <file> Check pipeline syntax
-claude-pipeline list            Show available pipelines
-```
-
-## Requirements
-
-- Node.js 18+
-- `claude` CLI installed and authenticated (`npm install -g @anthropic-ai/claude-code`)
-
-## License
-
-MIT
+<sub>Node >=18 · MIT · by <a href="https://github.com/NickCirv">NickCirv</a></sub>
